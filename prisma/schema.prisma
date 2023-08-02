@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model usuario {
+  id         String    @id @default(uuid())
+  documento  String    @unique
+  nome       String
+  sobrenome  String
+  email      String    @unique
+  senha      String
+  telefone   String
+  endereco   String?
+  role       Role      @default(USER)
+  ativo      Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  animal     animal[]
+}
+
+model animal {
+  id               String    @id @default(uuid())
+  nome             String
+  especie          String
+  raca             String
+  cor              String?
+  data_nascimento  DateTime?
+  ativo            Boolean   @default(true)
+  vacina           vacina[]
+  usuario_relation usuario   @relation(fields: [usuario_id], references: [id])
+  usuario_id       String
+  created_at       DateTime  @default(now())
+  updated_at       DateTime? @updatedAt
+}
+
+model vacina {
+  id                  String    @id @default(uuid())
+  nome                String
+  data_aplicacao      DateTime
+  proxima_aplicacao   DateTime?
+  veterinario_aplicou String?
+  veterinario_crm     Int?
+  animal_relation     animal    @relation(fields: [animal_id], references: [id])
+  animal_id           String
+  created_at          DateTime  @default(now())
+  updated_at          DateTime? @updatedAt
+}
+
+enum Role {
+  ROOT
+  ADMIN
+  USER
+  GUEST
+}
